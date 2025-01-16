@@ -1,0 +1,7 @@
+# TODO
+1. create basic UI for upload image and files uploaded
+2. upload files API
+3. get files API
+4. delete files API
+5. print selected files API
+6. Printer status

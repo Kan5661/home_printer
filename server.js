@@ -22,36 +22,40 @@ function getLocalIP() {
 // Get printer status
 function getPrinterStatus() {
     return new Promise((resolve, reject) => {
-        exec('lpstat -t', (error, stdout, stderr) => {
+        exec('lpstat -p', (error, stdout, stderr) => {
             if (error) {
                 reject(error);
                 return;
             }
-            
+
             const statusInfo = {
-                printers: [],
-                defaultPrinter: '',
-                isRunning: false
+                isEnabled: false,
+                status: '',
+                lastUpdate: '',
+                message: ''
             };
-            
+
             // Parse the output
             const lines = stdout.split('\n');
-            lines.forEach(line => {
-                if (line.includes('scheduler is running')) {
-                    statusInfo.isRunning = true;
+            for (const line of lines) {
+                if (line.includes('HL-L2300D-series')) {
+                    // Check if printer is enabled or disabled
+                    if (line.includes('disabled')) {
+                        statusInfo.isEnabled = false;
+                        const parts = line.split('disabled since');
+                        statusInfo.status = 'disabled';
+                        statusInfo.lastUpdate = parts[1]?.split('-')[0]?.trim() || '';
+                        statusInfo.message = parts[1]?.split('-')[1]?.trim() || '';
+                    } else {
+                        statusInfo.isEnabled = true;
+                        const parts = line.split('enabled since');
+                        statusInfo.status = line.split('is')[1].split('.')[0].trim(); // Gets 'idle' or other status
+                        statusInfo.lastUpdate = parts[1]?.trim() || '';
+                    }
+                    break;
                 }
-                if (line.includes('system default destination:')) {
-                    statusInfo.defaultPrinter = line.split(':')[1].trim();
-                }
-                if (line.includes('printer') && line.includes('is')) {
-                    const printerInfo = {
-                        name: line.split('printer')[1].split('is')[0].trim(),
-                        status: line.split('is')[1].split('.')[0].trim()
-                    };
-                    statusInfo.printers.push(printerInfo);
-                }
-            });
-            
+            }
+
             resolve(statusInfo);
         });
     });
@@ -93,7 +97,7 @@ app.post('/print', upload.single('file'), (req, res) => {
     }
 
     const filePath = req.file.path;
-    
+
     exec(`lp "${filePath}"`, (error, stdout, stderr) => {
         fs.unlink(filePath, (unlinkError) => {
             if (error || unlinkError) {

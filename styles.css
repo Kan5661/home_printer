@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #ebebeb;
 }
 
 .print-container {
@@ -23,6 +24,10 @@ body {
     touch-action: manipulation;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+}
+
+#printButton:hover {
+    background-color: #0069d9;
 }
 
 #printButton:active {

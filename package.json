@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "http-server": "^14.1.1"
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
 }

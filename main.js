@@ -1,8 +1,8 @@
-// main.js
 document.addEventListener('DOMContentLoaded', () => {
     const button = document.querySelector('#printButton');
     const fileInput = document.querySelector('#fileInput');
     const status = document.querySelector('#status');
+    const printerDetails = document.querySelector('#printerDetails');
     
     function updateStatus(message, isError = false) {
         status.textContent = message;
@@ -10,14 +10,56 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(message);
     }
     
-    // Remove the click event listener and use touchend/click for better mobile compatibility
+    async function updatePrinterStatus() {
+        try {
+            const response = await fetch('/status');
+            const statusData = await response.json();
+            
+            let statusHtml = '';
+            
+            if (statusData.isRunning) {
+                statusHtml += `<div>Print Service: <span style="color: #28a745">Running</span></div>`;
+            } else {
+                statusHtml += `<div>Print Service: <span style="color: #dc3545">Not Running</span></div>`;
+            }
+            
+            if (statusData.defaultPrinter) {
+                statusHtml += `<div>Default Printer: <span class="default-printer">${statusData.defaultPrinter}</span></div>`;
+            }
+            
+            if (statusData.printers.length > 0) {
+                statusHtml += '<div style="margin-top: 10px;">Printers:</div>';
+                statusData.printers.forEach(printer => {
+                    statusHtml += `
+                        <div class="printer-item">
+                            <span class="printer-name">${printer.name}</span>
+                            <span class="printer-status">${printer.status}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            printerDetails.innerHTML = statusHtml;
+            
+            // Update again in 30 seconds
+            setTimeout(updatePrinterStatus, 30000);
+        } catch (error) {
+            printerDetails.innerHTML = 'Error fetching printer status';
+            console.error('Status error:', error);
+            // Try again in 5 seconds if there was an error
+            setTimeout(updatePrinterStatus, 5000);
+        }
+    }
+    
+    // Initial status update
+    updatePrinterStatus();
+    
     const triggerFileInput = (e) => {
-        e.preventDefault(); // Prevent any default behavior
+        e.preventDefault();
         console.log('Triggering file input');
         fileInput.click();
     };
 
-    // Add both touch and click events for cross-device compatibility
     button.addEventListener('touchend', triggerFileInput, false);
     button.addEventListener('click', triggerFileInput, false);
     
@@ -45,6 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (response.ok) {
                 updateStatus('✅ File sent to printer successfully!');
+                // Update printer status after successful print
+                updatePrinterStatus();
             } else {
                 throw new Error('Server error');
             }
@@ -54,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             button.disabled = false;
             button.textContent = 'Select File to Print';
-            // Reset file input for next selection
             fileInput.value = '';
         }
     });

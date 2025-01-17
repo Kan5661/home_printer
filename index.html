@@ -4,13 +4,15 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Home Print</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Mobile print service">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">        
         <link rel="stylesheet" href="./styles.css">
     </head>
     <body>
-        <div style="margin: 20px;">
-            <button id="printButton" style="padding: 10px 20px; font-size: 16px;">Select File to print</button>
+        <div class="print-container">
+            <input type="file" id="fileInput" style="display: none;" accept="*/*">
+            <button id="printButton">Select File to Print</button>
+            <div id="status"></div>
         </div>
         <script src="./main.js"></script>
     </body>

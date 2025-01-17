@@ -1,61 +1,59 @@
 // main.js
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded');
-    
     const button = document.querySelector('#printButton');
-    console.log('Button found:', button);
+    const fileInput = document.querySelector('#fileInput');
+    const status = document.querySelector('#status');
     
-    if (!button) {
-        console.error('Button not found!');
-        return;
+    function updateStatus(message, isError = false) {
+        status.textContent = message;
+        status.style.color = isError ? 'red' : 'black';
+        console.log(message);
     }
     
     button.addEventListener('click', () => {
-        console.log('Button clicked');
-        
-        // Create file input
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        console.log('File input created');
-        
-        fileInput.addEventListener('change', async (e) => {
-            console.log('File selected');
-            const file = e.target.files[0];
-            if (!file) {
-                console.log('No file selected');
-                return;
-            }
-            
-            console.log('Selected file:', file.name);
-            
-            // Create FormData and append file
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            try {
-                console.log('Sending file to server...');
-                // Send file to server
-                const response = await fetch('/print', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    console.log('Print successful');
-                    alert('File sent to printer successfully!');
-                } else {
-                    console.error('Server error response');
-                    alert('Error printing file');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error uploading file');
-            }
-        });
-        
-        console.log('Triggering file input click');
         fileInput.click();
     });
     
-    console.log('Click listener added to button');
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            updateStatus('No file selected', true);
+            return;
+        }
+        
+        updateStatus(`Selected: ${file.name}`);
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        button.disabled = true;
+        button.textContent = 'Sending...';
+        
+        try {
+            updateStatus('Sending to printer...');
+            const response = await fetch('/print', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                updateStatus('✅ File sent to printer successfully!');
+            } else {
+                throw new Error('Server error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            updateStatus('❌ Error sending to printer', true);
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Select File to Print';
+            // Reset file input for next selection
+            fileInput.value = '';
+        }
+    });
+    
+    // Handle mobile touch events
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent double-tap zoom on mobile
+    });
 });

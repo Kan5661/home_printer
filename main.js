@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusHtml += `
                     <div class="printer-status">
                         <span class="status-badge disabled">🔴 ${statusData.status}</span>
-                        <div class="status-time">Since: ${statusData.lastUpdate}</div>
+                        <div class="status-time">Printer disabled/sleep</div>
                         ${statusData.message ? `<div class="status-message">${statusData.message}</div>` : ''}
                     </div>`;
             }

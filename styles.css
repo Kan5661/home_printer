@@ -80,6 +80,8 @@ body {
 
 .printer-status {
     color: #666;
+    display: flex;
+    gap: 5px
 }
 
 .default-printer {
@@ -93,7 +95,7 @@ body {
         padding: 20px;
         font-size: 20px;
     }
-    
+
     .status-container {
         width: 90%;
     }

@@ -29,6 +29,11 @@ body {
     background-color: #0056b3;
 }
 
+#printButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
 #status {
     margin-top: 20px;
     text-align: center;

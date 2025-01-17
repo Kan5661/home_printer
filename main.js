@@ -10,9 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(message);
     }
     
-    button.addEventListener('click', () => {
+    // Remove the click event listener and use touchend/click for better mobile compatibility
+    const triggerFileInput = (e) => {
+        e.preventDefault(); // Prevent any default behavior
+        console.log('Triggering file input');
         fileInput.click();
-    });
+    };
+
+    // Add both touch and click events for cross-device compatibility
+    button.addEventListener('touchend', triggerFileInput, false);
+    button.addEventListener('click', triggerFileInput, false);
     
     fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -50,10 +57,5 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset file input for next selection
             fileInput.value = '';
         }
-    });
-    
-    // Handle mobile touch events
-    button.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Prevent double-tap zoom on mobile
     });
 });
